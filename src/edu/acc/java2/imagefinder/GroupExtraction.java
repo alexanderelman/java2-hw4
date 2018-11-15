@@ -16,13 +16,21 @@ import java.util.regex.Matcher;
 public class GroupExtraction {
     private String regularExpression;
     private String fileName;
+    private List<String> captureGroups;
+
+
+    public GroupExtraction () {
+    }
+
+    public GroupExtraction(String regularExpression) {
+        this.regularExpression = regularExpression;
+    }
 
     public GroupExtraction(String regularExpression, String fileName) {
         this.regularExpression = regularExpression;
         this.fileName = fileName;
 
     }
-
 
     public String getRegularExpression() {
         return regularExpression;
@@ -40,38 +48,40 @@ public class GroupExtraction {
         this.fileName = fileName;
     }
 
-    private BufferedReader openFile() {
-        try (BufferedReader reader = new BufferedReader(new FileReader(this.fileName))) {
-            return reader;
-        } catch FileNotFoundException fileNotFoundException {
-            System.out.printf("File %s could not be found. \n\n%s\n", fileName, filenotfoundexception);
-        }
-        catch(IOException ioexception){
-            System.out.printf("IOException trying to access file %s" +
-                    "\n\n %s\n", fileName, ioexception);
-        }
+    private void openFile() throws IOException {
+        BufferedReader reader = new BufferedReader(new FileReader(this.fileName));
+        return;
     }
 
-    private List<String> generateCaptureGroups(BufferedReader reader) {
-        List<String> captureGroups = new ArrayList<>();
-        Pattern pattern = Pattern.compile(this.regularExpression);
-        BufferedReader reader = this.openFile();
+    public List<String> getCaptureGroups() {
+        return captureGroups;
+    }
 
-        line = reader.readLine();
+    private void setCaptureGroups(BufferedReader reader) throws IOException {
+        List<String> cg = new ArrayList<>();
+        Pattern pattern = Pattern.compile(this.regularExpression);
+        String line = reader.readLine();
 
         if (line == null) {
             System.out.println("Couldn't load file!");
-            return captureGroups;
+            return;
         }
 
         Matcher m = pattern.matcher(line);
-
+        int i;
         while (line != null) {
-            
+            i = 1;
+            if (m.matches()) {
+                while (m.find()) {
+                    captureGroups.add(m.group(i));
+                    i++;
+                }
+            }
             line = reader.readLine();
         }
+        this.captureGroups = cg;
 
-        return captureGroups;
+        return;
     }
 
     @java.lang.Override
